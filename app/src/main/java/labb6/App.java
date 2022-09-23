@@ -3,12 +3,62 @@
  */
 package labb6;
 
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.Toolkit;
+import javax.swing.*;
+
 public class App {
-    public String getGreeting() {
-        return "Hello World!";
+
+    // GLOBAL CONSTANTS
+    private static final int screenWidth = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+    private static final int screenHeight = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+
+    // GLOBAL VARIABLES
+
+    // GLOBAL SWING OBJECTS
+    private JFrame gameFrame = new JFrame("Florpy Dog");
+
+    // GLOBAL OBJECTS
+    private static App florpyGame = new App();
+
+    // CONSTRUCTOR
+    public App() {
+
     }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+
+        // GUI ON NEW THREAD
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                florpyGame.buildFrame();
+                Thread threadGUI = new Thread() {
+                    public void run() {
+                        // THE GAME WILL START HERE
+                    }
+                };
+                threadGUI.start();
+            }
+        });
+    }
+
+    // JFRAME METHOD
+    private void buildFrame() {
+
+        Image player = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("../resources/florpy_dog.png"));
+        gameFrame.setContentPane(createContentPane());
+        gameFrame.setResizable(true);
+        gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        gameFrame.setAlwaysOnTop(false);
+        gameFrame.setVisible(true);
+        gameFrame.setMinimumSize(new Dimension(screenWidth * 1 / 4, screenHeight * 1 / 4));
+        gameFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        gameFrame.setIconImage(player);
+    }
+
+    private JPanel createContentPane() {
+        JPanel topPanel = new JPanel();
+        return topPanel;
     }
 }
