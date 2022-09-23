@@ -46,7 +46,8 @@ public class App {
     // JFRAME METHOD
     private void buildFrame() {
 
-        Image player = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("../resources/florpy_dog.png"));
+        Image gameIcon = Toolkit.getDefaultToolkit()
+                .getImage(this.getClass().getResource("../resources/florpy_dog.png"));
         gameFrame.setContentPane(createContentPane());
         gameFrame.setResizable(true);
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -54,7 +55,7 @@ public class App {
         gameFrame.setVisible(true);
         gameFrame.setMinimumSize(new Dimension(screenWidth * 1 / 4, screenHeight * 1 / 4));
         gameFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        gameFrame.setIconImage(player);
+        gameFrame.setIconImage(gameIcon);
     }
 
     private JPanel createContentPane() {
