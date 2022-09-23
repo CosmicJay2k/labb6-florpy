@@ -4,11 +4,18 @@
 package labb6;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Image;
+import java.awt.Color;
+import java.awt.LayoutManager;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
+
 import javax.swing.*;
 
-public class App {
+public class App implements ActionListener {
 
     // GLOBAL CONSTANTS
     private static final int screenWidth = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
@@ -18,9 +25,12 @@ public class App {
 
     // GLOBAL SWING OBJECTS
     private JFrame gameFrame = new JFrame("Florpy Dog");
+    private JPanel topPanel;
+    private JButton startGame;
 
     // GLOBAL OBJECTS
     private static App florpyGame = new App();
+    private static PlayGameScreen playGameScreen;
 
     // CONSTRUCTOR
     public App() {
@@ -56,10 +66,38 @@ public class App {
         gameFrame.setMinimumSize(new Dimension(screenWidth * 1 / 4, screenHeight * 1 / 4));
         gameFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         gameFrame.setIconImage(gameIcon);
+        gameFrame.addKeyListener((KeyListener) this);
     }
 
+    // CREATE CONTENT PANE METHOD
     private JPanel createContentPane() {
-        JPanel topPanel = new JPanel();
+
+        topPanel = new JPanel();
+        topPanel.setBackground(Color.BLACK);
+
+        LayoutManager overlay = new OverlayLayout(topPanel);
+        topPanel.setLayout(overlay);
+
+        startGame = new JButton("Börja Florpa!");
+        startGame.setBackground(Color.MAGENTA);
+        startGame.setForeground(Color.WHITE);
+        startGame.setFocusable(false);
+        startGame.setFont(new Font("Calibri", Font.BOLD, 42));
+        startGame.setAlignmentX(0.5f);
+        startGame.setAlignmentY(0.5f);
+        startGame.addActionListener((ActionListener) this);
+        topPanel.add(startGame);
+
+        playGameScreen = new PlayGameScreen(screenWidth, screenHeight, true);
+        topPanel.add(playGameScreen);
+
         return topPanel;
+    }
+
+    // ACTION EVENTS
+    public void actionPerformed(ActionEvent ae) {
+        if (ae.getSource() == startGame) {
+
+        }
     }
 }
