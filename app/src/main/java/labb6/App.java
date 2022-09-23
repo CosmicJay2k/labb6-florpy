@@ -11,7 +11,6 @@ import java.awt.LayoutManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
@@ -20,8 +19,14 @@ public class App implements ActionListener {
     // GLOBAL CONSTANTS
     private static final int screenWidth = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
     private static final int screenHeight = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+    private static final int pipeGap = screenHeight / 5;
+    private static final int pipeWidth = screenWidth / 8, pipeHeight = 4 * pipeWidth;
+    private static final int updateDiff = 25;
+    private static final int xMovementDiff = 5;
+    private static final int screenDelay = 300;
 
     // GLOBAL VARIABLES
+    private boolean pipeLoop = true;
 
     // GLOBAL SWING OBJECTS
     private JFrame gameFrame = new JFrame("Florpy Dog");
@@ -45,7 +50,7 @@ public class App implements ActionListener {
                 florpyGame.buildFrame();
                 Thread threadGUI = new Thread() {
                     public void run() {
-                        // THE GAME WILL START HERE
+                        florpyGame.gameScreen(true);
                     }
                 };
                 threadGUI.start();
@@ -66,7 +71,7 @@ public class App implements ActionListener {
         gameFrame.setMinimumSize(new Dimension(screenWidth * 1 / 4, screenHeight * 1 / 4));
         gameFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         gameFrame.setIconImage(gameIcon);
-        gameFrame.addKeyListener((KeyListener) this);
+        // gameFrame.addKeyListener(this);
     }
 
     // CREATE CONTENT PANE METHOD
@@ -85,7 +90,7 @@ public class App implements ActionListener {
         startGame.setFont(new Font("Calibri", Font.BOLD, 42));
         startGame.setAlignmentX(0.5f);
         startGame.setAlignmentY(0.5f);
-        startGame.addActionListener((ActionListener) this);
+        startGame.addActionListener(this);
         topPanel.add(startGame);
 
         playGameScreen = new PlayGameScreen(screenWidth, screenHeight, true);
@@ -99,5 +104,70 @@ public class App implements ActionListener {
         if (ae.getSource() == startGame) {
 
         }
+    }
+
+    // SPLASH SCREEN ANIMATOR
+    private void gameScreen(boolean isSplashScreen) {
+
+        BottomPipe bottomPipe1 = new BottomPipe(pipeWidth, pipeHeight);
+        BottomPipe bottomPipe2 = new BottomPipe(pipeWidth, pipeHeight);
+        TopPipe topPipe1 = new TopPipe(pipeWidth, pipeHeight);
+        TopPipe topPipe2 = new TopPipe(pipeWidth, pipeHeight);
+
+        // TRACKING BOTTOM PIPE
+        int xLocation1 = screenWidth + screenDelay,
+                xLocation2 = (int) ((double) 3.0 / 2.0 * screenWidth + pipeWidth / 2.0) + screenDelay;
+        int yLocation1 = bottomPipeLocation(), yLocation2 = bottomPipeLocation();
+
+        long startTime = System.currentTimeMillis();
+
+        while (pipeLoop) {
+            if ((System.currentTimeMillis() - startTime) > updateDiff) {
+                if (xLocation1 < (0 - pipeWidth)) {
+                    xLocation1 = screenWidth;
+                    xLocation2 = bottomPipeLocation();
+                } else if (xLocation2 < (0 - pipeWidth)) {
+                    xLocation2 = screenWidth;
+                    xLocation2 = bottomPipeLocation();
+                }
+
+                // CHANGE LOCATION
+                xLocation1 -= xMovementDiff;
+                xLocation2 -= xMovementDiff;
+
+                // UPDATE LOCATION
+                bottomPipe1.setX(xLocation1);
+                bottomPipe1.setY(yLocation1);
+                bottomPipe2.setX(xLocation2);
+                bottomPipe2.setY(yLocation2);
+                topPipe1.setX(xLocation1);
+                topPipe1.setY(yLocation1 - pipeGap - pipeHeight);
+                topPipe2.setX(xLocation2);
+                topPipe2.setY(yLocation2 - pipeGap - pipeHeight);
+
+                // SET PIPE VARIABLES IN PlayGameScreen
+                playGameScreen.setBottomPipe(bottomPipe1, bottomPipe2);
+                playGameScreen.setTopPipe(topPipe1, topPipe2);
+
+                // UPDATE PlayGameScreen JPanel
+                topPanel.revalidate();
+                topPanel.repaint();
+
+                // UPDATE TIME
+                startTime = System.currentTimeMillis();
+
+            }
+        }
+    }
+
+    // RANDOM BOTTOM PIPE PLACEMENT METHOD
+    private int bottomPipeLocation() {
+        int temp = 0;
+
+        while (temp <= pipeGap + 50 || temp >= screenHeight - pipeGap) {
+            temp = (int) ((double) Math.random() * ((double) screenHeight));
+        }
+
+        return temp;
     }
 }
